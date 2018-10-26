@@ -5,9 +5,9 @@ const posts = new Router();
 
 posts.get('/', postsCtrl.list);
 posts.post('/', postsCtrl.write);
-posts.get('/:id', postsCtrl.read);
-posts.delete('/:id', postsCtrl.remove);
-posts.patch('/:id', postsCtrl.replace);
+posts.get('/:id', postsCtrl.checkObjectId, postsCtrl.read);
+posts.delete('/:id', postsCtrl.checkObjectId, postsCtrl.remove);
+posts.patch('/:id', postsCtrl.checkObjectId, postsCtrl.replace);
 
 /*
 const printInfo = (ctx) => {
