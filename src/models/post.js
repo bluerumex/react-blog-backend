@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
-const { Shcema } = mongoose;
+const { Schema } = mongoose;
 
-const Post = new Shcema({
+const Post = new Schema({
     title: String,
     body: String,
     tags: [String],

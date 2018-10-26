@@ -1,74 +1,67 @@
-let postId = 1;
-
-const posts = [
-    {
-        id: 1,
-        title: '제목',
-        body: '내용'
-    }
-];
+const Post = require('models/post');
 
 /*
 포스트 작성
 POST /api/posts
 { title, body }
 */
-exports.write = (ctx) => {
-    const { title, body } = ctx.request.body;
+exports.write = async (ctx) => {
+    const { title, body, tags } = ctx.request.body;
+    const post = new Post({
+        title, body, tags
+    });
 
-    postId += 1;
-
-    const post = { id: postId, title, body };
-    posts.push(post);
-    ctx.body = post;
+    try {
+        await post.save();
+        ctx.body = post;
+    } catch(e) {
+        ctx.throw(e, 500);
+    }
 };
 
 /*
 포스트 목록 조회
 GET /api/posts
 */
-exports.list = (ctx) => {
-    ctx.body = posts;
+exports.list = async (ctx) => {
+    try {
+        const posts = await Post.find().exec();
+        ctx.body = posts;
+    } catch(e) {
+        ctx.throw(e, 500);
+    }
 };
 
 /*
 특정 포스트 조회
 GET /api/posts/:id
 */
-exports.read = (ctx) => {
+exports.read = async (ctx) => {
     const { id } = ctx.params;
-    const post = posts.find(p => p.id.toString() === id);
-
-    if (!post) {
-        ctx.status = 404;
-        ctx.body = {
-            message: '포스트가 존재하지 않습니다'
-        };
-        return;
+    try {
+        const post = await Post.findById(id).exec();
+        if(!post) {
+            ctx.status = 404;
+            return;
+        }
+        ctx.body = post;
+    } catch(e) {
+        ctx.throw(e, 500);
     }
-
-    ctx.body = post;
 };
 
 /*
 특정 포스트 제거
 DELETE /api/posts/:id
 */
-exports.remove = (ctx) => {
+exports.remove = async (ctx) => {
     const { id } = ctx.params;
-
-    const index = posts.findIndex(p => p.id.toString() === id);
-
-    if (index === -1) {
-        ctx.status = 404;
-        ctx.body = {
-            message: '포스트가 존재하지 않습니다.'
-        };
-        return;
+    try {
+        await Post.findByIdAndRemove(id).exec();
+        ctx.status = 204;
+    } catch(e) {
+        ctx.throw(e, 500);
     }
-
-    posts.slice(index, 1);
-    ctx.status = 204;
 };
 
 /*
@@ -77,22 +70,7 @@ PUT /api/posts/:id
 { title, body }
 */
 exports.replace = (ctx) => {
-    const { id } = ctx.params;
-    const index = posts.findIndex(p => p.id.toString() === id);
-
-    if (index === -1) {
-        ctx.status = 404;
-        ctx.body = {
-            message: '포스트가 존재하지 않습니다.'
-        };
-        return;
-    }
-
-    posts[index] = {
-        id,
-        ...ctx.request.body
-    };
-    ctx.body = posts[index];
+    
 };
 
 /*
@@ -100,21 +78,20 @@ exports.replace = (ctx) => {
 PATCH /api/posts
 { title, body }
 */
-exports.update = (ctx) => {
+exports.update = async (ctx) => {
+    console.log('update....');
     const { id } = ctx.params;
-    const index = posts.findIndex(p => p.id.toString() === id);
+    try {
+        const post = Post.findByIdAndUpdate(id, request.body, {
+            new: true
+        }).exec();
 
-    if (index === -1) {
-        ctx.status = 404;
-        ctx.body = {
-            message: '포스트가 존재하지 않습니다.'
-        };
-        return;
+        if (!post) {
+            ctx.status = 404;
+            return;
+        }
+        ctx.body = post;
+    } catch(e) {
+        ctx.throw(e, 500);
     }
-
-    posts[index] = {
-        ...posts[index],
-        ...ctx.request.body
-    };
-    ctx.body = posts[index];
 };
