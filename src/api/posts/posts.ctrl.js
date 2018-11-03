@@ -1,9 +1,13 @@
 const Post = require('models/post');
-const { ObjectId } = require('mongoose').Types;
+const {
+    ObjectId
+} = require('mongoose').Types;
 const Joi = require('joi');
 
 exports.checkObjectId = (ctx, next) => {
-    const { id } = ctx.params;
+    const {
+        id
+    } = ctx.params;
 
     if (!ObjectId.isValid(id)) {
         ctx.status = 400;
@@ -33,15 +37,21 @@ exports.write = async (ctx) => {
         return;
     }
 
-    const { title, body, tags } = ctx.request.body;
+    const {
+        title,
+        body,
+        tags
+    } = ctx.request.body;
     const post = new Post({
-        title, body, tags
+        title,
+        body,
+        tags
     });
 
     try {
         await post.save();
         ctx.body = post;
-    } catch(e) {
+    } catch (e) {
         ctx.throw(e, 500);
     }
 };
@@ -52,13 +62,13 @@ GET /api/posts
 */
 exports.list = async (ctx) => {
     const page = parseInt(ctx.query.page || 1, 10);
-    const { tag } = ctx.query;
+    const {
+        tag
+    } = ctx.query;
 
-    const query = tag ? 
-    {
+    const query = tag ? {
         tags: tag
-    } :
-    {};
+    } : {};
 
     if (page < 1) {
         ctx.status = 400;
@@ -67,7 +77,9 @@ exports.list = async (ctx) => {
 
     try {
         const posts = await Post.find(query)
-            .sort({_id: -1})
+            .sort({
+                _id: -1
+            })
             .limit(10)
             .skip((page - 1) * 10)
             .lean()
@@ -75,13 +87,12 @@ exports.list = async (ctx) => {
         const postCount = await Post.count(query).exec();
         const limitBodyLength = post => ({
             ...post,
-            body: post.body.lenth < 350 ? 
-                post.body : 
-                `${post.body.slice(0, 350)}...`
+            body: post.body.lenth < 350 ?
+                post.body : `${post.body.slice(0, 350)}...`
         });
         ctx.body = posts.map(limitBodyLength);
         ctx.set('Last-page', Math.ceil(postCount / 10));
-    } catch(e) {
+    } catch (e) {
         ctx.throw(e, 500);
     }
 };
@@ -91,15 +102,17 @@ exports.list = async (ctx) => {
 GET /api/posts/:id
 */
 exports.read = async (ctx) => {
-    const { id } = ctx.params;
+    const {
+        id
+    } = ctx.params;
     try {
         const post = await Post.findById(id).exec();
-        if(!post) {
+        if (!post) {
             ctx.status = 404;
             return;
         }
         ctx.body = post;
-    } catch(e) {
+    } catch (e) {
         ctx.throw(e, 500);
     }
 };
@@ -109,22 +122,15 @@ exports.read = async (ctx) => {
 DELETE /api/posts/:id
 */
 exports.remove = async (ctx) => {
-    const { id } = ctx.params;
+    const {
+        id
+    } = ctx.params;
     try {
         await Post.findByIdAndRemove(id).exec();
         ctx.status = 204;
-    } catch(e) {
+    } catch (e) {
         ctx.throw(e, 500);
     }
-};
-
-/*
-포스트 수정(교체)
-PUT /api/posts/:id
-{ title, body }
-*/
-exports.replace = (ctx) => {
-    
 };
 
 /*
@@ -134,9 +140,11 @@ PATCH /api/posts
 */
 exports.update = async (ctx) => {
     console.log('update....');
-    const { id } = ctx.params;
+    const {
+        id
+    } = ctx.params;
     try {
-        const post = Post.findByIdAndUpdate(id, request.body, {
+        const post = Post.findByIdAndUpdate(id, ctx.request.body, {
             new: true
         }).exec();
 
@@ -145,7 +153,7 @@ exports.update = async (ctx) => {
             return;
         }
         ctx.body = post;
-    } catch(e) {
+    } catch (e) {
         ctx.throw(e, 500);
     }
 };
