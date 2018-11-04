@@ -13,6 +13,7 @@ module.exports = {
         "eol-last": 0,
         "no-console": 0,
         "linebreak-style": 0,
-        "indent": 0
+        "indent": 0,
+        "operator-linebreak": 0
     }
 };

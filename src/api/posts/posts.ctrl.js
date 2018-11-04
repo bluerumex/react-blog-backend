@@ -1,5 +1,4 @@
 const Post = require('models/post');
-
 const {
     ObjectId
 } = require('mongoose').Types;
@@ -89,7 +88,8 @@ exports.list = async (ctx) => {
         const limitBodyLength = post => ({
             ...post,
             body: post.body.lenth < 350 ?
-                post.body : `${post.body.slice(0, 350)}...`
+                post.body :
+                `${post.body.slice(0, 350)}...`
         });
         ctx.body = posts.map(limitBodyLength);
         ctx.set('Last-page', Math.ceil(postCount / 10));
@@ -136,14 +136,12 @@ exports.remove = async (ctx) => {
 
 /*
 포스트 수정(특정 필드 변경)
-PATCH /api/posts
-{ title, body }
+PATCH /api/posts/:id
+{ title, body, tags }
 */
 exports.update = async (ctx) => {
-    console.log('update....');
-    const {
-        id
-    } = ctx.params;
+    const { id } = ctx.params;
+
     try {
         const post = Post.findByIdAndUpdate(id, ctx.request.body, {
             new: true
