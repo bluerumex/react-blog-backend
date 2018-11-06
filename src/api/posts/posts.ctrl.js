@@ -1,7 +1,6 @@
 const Post = require('models/post');
-const {
-    ObjectId
-} = require('mongoose').Types;
+
+const { ObjectId } = require('mongoose').Types;
 const Joi = require('joi');
 
 exports.checkObjectId = (ctx, next) => {
