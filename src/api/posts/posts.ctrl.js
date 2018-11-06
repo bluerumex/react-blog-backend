@@ -16,6 +16,14 @@ exports.checkObjectId = (ctx, next) => {
     return next();
 };
 
+exports.checkLogin = (ctx, next) => {
+    if (!ctx.session.logged) {
+        ctx.status = 401; // Unathorized
+        return null;
+    }
+    return next();
+};
+
 /*
 포스트 작성
 POST /api/posts
