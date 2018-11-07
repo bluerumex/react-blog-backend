@@ -4,8 +4,9 @@ const Koa = require('koa');
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const mongoose = require('mongoose');
-const session = require('koa-session');
 const api = require('./api');
+const session = require('koa-session');
+
 
 const app = new Koa();
 const router = new Router();
@@ -18,7 +19,7 @@ const {
 
 mongoose.Promise = global.Promise;
 mongoose.connect(mongoURI).then(() => {
-    console.log('connect to mongodb');
+    console.log('connected to mongodb');
 }).catch((e) => {
     console.error(e);
 });
